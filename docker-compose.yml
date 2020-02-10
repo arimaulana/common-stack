@@ -38,6 +38,9 @@ services:
     image: consul:1.6.3
     container_name: common-consul
     restart: always
+    network_mode: host
+    environment: 
+      CONSUL_BIND_INTERFACE: docker0
     ports:
       - 8400:8400
       - 8500:8500
