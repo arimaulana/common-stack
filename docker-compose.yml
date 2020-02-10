@@ -33,3 +33,14 @@ services:
       PMA_PORT: 3306
     ports:
       - 8001:80
+
+  common-consul:
+    image: consul:1.6.3
+    container_name: common-consul
+    restart: always
+    ports:
+      - 8400:8400
+      - 8500:8500
+      - 8600:8600
+      - 8600:8600/udp
+    command: "agent -server -bootstrap-expect 1 -ui -client 0.0.0.0"
