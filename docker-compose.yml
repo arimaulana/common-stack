@@ -1,6 +1,30 @@
 version: '3'
 
 services:
+  # common-zipkin:
+  #   image: openzipkin/zipkin:latest
+  #   container_name: common-zipkin
+  #   ports:
+  #     - 9411:9411
+
+  # common-redis:
+  #   image: bitnami/redis:latest
+  #   container_name: common-redis
+  #   environment:
+  #     ALLOW_EMPTY_PASSWORD: "yes"
+  #   ports:
+  #     - 6379:6379
+
+  # common-mongodb:
+  #   image: bitnami/mongodb:4.4.0
+  #   container_name: common-mongodb
+  #   environment:
+  #     ALLOW_EMPTY_PASSWORD: "yes"
+  #     MONGODB_REPLICA_SET_MODE: primary # mongodb transaction should need in replica mode
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - mongodb_master_data:/bitnami
 
   # common-mysql:
   #   image: mysql:5.7.29
@@ -226,3 +250,9 @@ services:
 
 # volumes:
 #   common-consul
+
+volumes:
+  # common_mongo_data:
+  #   driver: local
+  mongodb_master_data:
+    driver: local
