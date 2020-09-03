@@ -1,22 +1,50 @@
-version: '3'
+version: "3"
 
 services:
-  # common-zipkin:
-  #   image: openzipkin/zipkin:latest
-  #   container_name: common-zipkin
-  #   ports:
-  #     - 9411:9411
+  common-zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: common-zipkin
+    ports:
+      - 9411:9411
 
-  # common-redis:
-  #   image: bitnami/redis:latest
-  #   container_name: common-redis
-  #   environment:
-  #     ALLOW_EMPTY_PASSWORD: "yes"
-  #   ports:
-  #     - 6379:6379
+  common-redis:
+    image: bitnami/redis:latest
+    container_name: common-redis
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - 6379:6379
+
+  common-mongodb:
+    image: mongo:latest
+    container_name: common-mongodb
+    restart: always
+    # replica set needed to enable transaction feature in mongodb
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
+    ports:
+      - 27017:27017
+    volumes:
+      - common_mongo_data:/data/db
+      - common_mongo_config:/data/configdb
+
+  # common-mongodb2:
+  #   image: mongo:latest
+  #   container_name: common-mongodb2
+  #   restart: always
+  #   entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
+
+  common-mongoclient: # this used for activating replica set
+    image: mongo:latest
+    container_name: common-mongoclient
+    depends_on:
+      - common-mongodb
+      # - common-mongodb2
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: [ "bash", "/scripts/mongodb/initiate_replica.sh" ]
 
   # common-mongodb:
-  #   image: bitnami/mongodb:4.4.0
+  #   image: bitnami/mongodb:4.2.9
   #   container_name: common-mongodb
   #   environment:
   #     ALLOW_EMPTY_PASSWORD: "yes"
@@ -190,14 +218,13 @@ services:
   #     KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
   #     KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
 
-
   ## Service Discovery
   # common-consul:
   #   image: consul:1.6.3
   #   container_name: common-consul
   #   restart: always
   #   network_mode: host
-  #   environment: 
+  #   environment:
   #     CONSUL_BIND_INTERFACE: docker0
   #   ports:
   #     - 8400:8400
@@ -252,7 +279,9 @@ services:
 #   common-consul
 
 volumes:
-  # common_mongo_data:
-  #   driver: local
-  mongodb_master_data:
+  common_mongo_data:
     driver: local
+  common_mongo_config:
+    driver: local
+  # mongodb_master_data:
+  #   driver: local
