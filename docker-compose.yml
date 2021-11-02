@@ -89,6 +89,58 @@ services:
 #       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
 #       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASS:-123456}
 
+  common-mysql-master:
+    image: docker.io/bitnami/mysql:8.0
+    container_name: common-mysql-master
+    # command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3306:3306
+    volumes:
+      - 'common_mysql_master_data:/bitnami/mysql/data'
+    environment:
+      - MYSQL_REPLICATION_MODE=master
+      - MYSQL_REPLICATION_USER=repl_user
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_ROOT_PASSWORD=my_root_password
+    healthcheck:
+      test: ['CMD', '/opt/bitnami/scripts/mysql/healthcheck.sh']
+      interval: 15s
+      timeout: 5s
+      retries: 6
+
+  common-mysql-slave:
+    image: docker.io/bitnami/mysql:8.0
+    container_name: common-mysql-slave
+    # command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3307:3306
+    depends_on:
+      - common-mysql-master
+    environment:
+      - MYSQL_REPLICATION_MODE=slave
+      - MYSQL_REPLICATION_USER=repl_user
+      - MYSQL_MASTER_HOST=mysql-master
+      - MYSQL_MASTER_PORT_NUMBER=3306
+      - MYSQL_MASTER_ROOT_PASSWORD=my_root_password
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ['CMD', '/opt/bitnami/scripts/mysql/healthcheck.sh']
+      interval: 15s
+      timeout: 5s
+      retries: 6
+
+  common-phpmyadmin:
+    image: docker.io/bitnami/phpmyadmin:5
+    container_name: common-phpmyadmin
+    restart: always
+    environment:
+      DATABASE_HOST: common-mysql-master
+    ports:
+      - '3301:8080'
+      - '443:8443'
+
   # common-mysql:
   #   image: mysql:5.7.29
   #   container_name: common-mysql
@@ -109,7 +161,7 @@ services:
   #     PMA_HOST: common-mysql
   #     PMA_PORT: 3306
   #   ports:
-  #     - 8001:80
+  #     - 3301:80
 
   # zookeeper:
   #   image: ${CONFLUENT_REPOSITORY:-confluentinc}/cp-zookeeper:${CONFLUENT_TAG:-5.4.1}
@@ -320,5 +372,7 @@ volumes:
     driver: local
   # mongodb_master_data:
   #   driver: local
+  common_mysql_master_data:
+    driver: local
 #   influxdb-storage:
 #   grafana-storage:
