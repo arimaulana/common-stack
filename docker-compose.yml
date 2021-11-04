@@ -139,7 +139,7 @@ services:
       DATABASE_HOST: common-mysql-master
     ports:
       - '3301:8080'
-      - '443:8443'
+      # - '443:8443'
 
   # common-mysql:
   #   image: mysql:5.7.29
