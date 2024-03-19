@@ -17,12 +17,12 @@ services:
     ports:
       - 6379:6379
 
-  common-google-pubsub:
-    image: adhawk/google-pubsub-emulator
-    container_name: common-google-pubsub
-    restart: always
-    ports:
-      - 8085:8085
+  # common-google-pubsub:
+  #   image: adhawk/google-pubsub-emulator
+  #   container_name: common-google-pubsub
+  #   restart: always
+  #   ports:
+  #     - 8085:8085
 
   common-mongodb:
     image: mongo:latest
