@@ -19,7 +19,7 @@ services:
 
   common-postgis:
     build: ./custom-image/postgis
-    container_name: common-postgres
+    container_name: common-postgis
     restart: always
     environment:
       - POSTGRES_USER=postgres
