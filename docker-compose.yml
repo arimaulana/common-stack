@@ -29,6 +29,18 @@ services:
     volumes:
       - common_postgis:/var/lib/postgresql/data
 
+  common-google-pubsub-emulator-engine:
+    image: messagebird/gcloud-pubsub-emulator:latest
+    ports:
+      - "8681:8681"
+    environment:
+      - PUBSUB_PROJECT1=test-project,topic1:topic1-sub,topic2:t2-s1:t2-s2
+
+  common-google-pubsub-emulator-ui:
+    image: ghcr.io/neoscript/pubsub-emulator-ui:latest
+    ports:
+      - "8680:80"
+
   # common-google-pubsub:
   #   image: adhawk/google-pubsub-emulator
   #   container_name: common-google-pubsub
